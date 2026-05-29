@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1a1a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MappaMente">
+<link rel="manifest" href="manifest.json">
+<title>MappaMente — Mappe Concettuali AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<style>
+:root{
+  --bg:#0d0d1a;--bg2:#13132a;--bg3:#1a1a38;
+  --surface:#1e1e3f;--surface2:#252550;
+  --border:rgba(120,100,255,.15);--border2:rgba(120,100,255,.3);
+  --accent:#7c6fff;--accent2:#a78fff;--accent3:#c4b5fd;
+  --green:#34d399;--amber:#fbbf24;--red:#f87171;
+  --text:#f0eeff;--text2:#a8a0d0;--text3:#6b6494;
+  --r:12px;--r2:18px;
+  --shadow:0 4px 32px rgba(100,80,255,.12);
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column}
+
+/* ── TOPBAR ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:calc(var(--safe-top) + 12px) 16px 12px;
+  background:var(--bg);border-bottom:1px solid var(--border);
+  flex-shrink:0;z-index:100;
+}
+.logo{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;color:var(--accent3);letter-spacing:-.5px}
+.logo span{color:var(--green)}
+.topbar-right{display:flex;gap:6px}
+.icon-btn{
+  width:36px;height:36px;border-radius:var(--r);
+  border:1px solid var(--border);background:var(--surface);
+  color:var(--text2);cursor:pointer;font-size:17px;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;
+}
+.icon-btn:hover,.icon-btn:active{background:var(--surface2);color:var(--accent3);border-color:var(--border2)}
+
+/* ── NAV ── */
+.nav{
+  display:flex;gap:4px;padding:8px 12px;
+  border-bottom:1px solid var(--border);overflow-x:auto;
+  flex-shrink:0;scrollbar-width:none;
+}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{
+  display:flex;align-items:center;gap:5px;
+  padding:7px 12px;border-radius:var(--r);
+  border:1px solid transparent;background:transparent;
+  color:var(--text2);cursor:pointer;font-size:13px;font-weight:500;
+  white-space:nowrap;transition:all .2s;font-family:'Outfit',sans-serif;
+}
+.nav-btn:hover{background:var(--surface);color:var(--text)}
+.nav-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.nav-btn i{font-size:15px}
+
+/* ── SCROLL AREA ── */
+.main{
+  flex:1;overflow-y:auto;padding:16px;
+  padding-bottom:calc(var(--safe-bottom) + 20px);
+  scrollbar-width:thin;scrollbar-color:var(--surface2) transparent;
+}
+.screen{display:none}.screen.active{display:block}
+
+/* ── HOME ── */
+.hero{text-align:center;padding:24px 0 20px}
+.hero h1{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;line-height:1.25}
+.hero h1 em{color:var(--accent3);font-style:normal}
+.hero p{color:var(--text2);margin-top:8px;font-size:14px;line-height:1.6}
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.action-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r2);padding:16px;
+  cursor:pointer;transition:all .2s;text-align:left;
+}
+.action-card:active{background:var(--surface2);border-color:var(--border2);transform:scale(.98)}
+.action-icon{font-size:26px;margin-bottom:10px}
+.action-card h3{font-size:14px;font-weight:600;margin-bottom:3px}
+.action-card p{font-size:12px;color:var(--text3);line-height:1.5}
+.recent-section{margin-top:24px}
+.section-title{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.map-card-mini{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 12px;background:var(--surface);border-radius:var(--r);
+  border:1px solid var(--border);margin-bottom:7px;cursor:pointer;transition:all .2s;
+}
+.map-card-mini:active{background:var(--surface2);border-color:var(--border2)}
+.map-tag{width:34px;height:34px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.map-info{flex:1;min-width:0}
+.map-info h4{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-info p{font-size:11px;color:var(--text3);margin-top:2px}
+.map-meta{font-size:11px;color:var(--text3);flex-shrink:0}
+
+/* ── UPLOAD ── */
+.upload-area{
+  border:2px dashed var(--border2);border-radius:var(--r2);
+  padding:36px 20px;text-align:center;cursor:pointer;
+  transition:all .2s;position:relative;overflow:hidden;background:var(--bg3);
+}
+.upload-area:active{border-color:var(--accent);background:rgba(124,111,255,.06)}
+.upload-area input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-icon{font-size:42px;color:var(--accent);margin-bottom:10px}
+.upload-area h3{font-size:16px;font-weight:600;margin-bottom:5px}
+.upload-area p{font-size:12px;color:var(--text2)}
+.camera-btn{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  width:100%;padding:12px;border-radius:var(--r);
+  border:1px solid var(--border2);background:var(--surface);
+  color:var(--text);font-size:14px;font-weight:500;cursor:pointer;
+  margin-top:8px;transition:all .2s;font-family:'Outfit',sans-serif;
+}
+.camera-btn:active{background:var(--surface2);border-color:var(--accent);color:var(--accent3)}
+.camera-btn i{font-size:18px}
+.preview-img{width:100%;max-height:220px;object-fit:contain;border-radius:var(--r);margin-bottom:12px;border:1px solid var(--border)}
+.subject-select{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.subj-chip{
+  padding:6px 12px;border-radius:20px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text2);font-size:12px;
+  cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif;
+}
+.subj-chip:active,.subj-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-main{
+  width:100%;padding:13px;border-radius:var(--r);
+  background:var(--accent);border:none;color:#fff;
+  font-size:15px;font-weight:600;cursor:pointer;
+  transition:all .2s;font-family:'Outfit',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.btn-main:active{background:#6a5ef5;transform:scale(.99)}
+.btn-main:disabled{opacity:.5;cursor:not-allowed}
+.btn-main i{font-size:17px}
+textarea{
+  width:100%;padding:11px;border-radius:var(--r);
+  border:1px solid var(--border2);background:var(--bg3);
+  color:var(--text);font-size:14px;resize:none;min-height:110px;
+  font-family:'Outfit',sans-serif;margin:6px 0;
+}
+textarea:focus{outline:none;border-color:var(--accent)}
+.or-divider{text-align:center;color:var(--text3);font-size:12px;margin:8px 0}
+
+/* ── LOADING ── */
+.loading-box{text-align:center;padding:40px 20px;background:var(--surface);border-radius:var(--r2);border:1px solid var(--border)}
+.spinner{width:44px;height:44px;margin:0 auto 18px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-steps{margin-top:18px;display:flex;flex-direction:column;gap:7px}
+.loading-step{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text3);padding:7px 11px;border-radius:8px;background:var(--bg3)}
+.loading-step.done{color:var(--green)}.loading-step.active{color:var(--text)}
+
+/* ── MAP ── */
+.map-canvas{position:relative;background:var(--bg2);border-radius:var(--r2);border:1px solid var(--border);overflow:hidden}
+.map-svg{width:100%;height:360px}
+.map-legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.legend-dot{width:9px;height:9px;border-radius:50%}
+.map-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.btn-sm{
+  display:flex;align-items:center;gap:5px;
+  padding:7px 12px;border-radius:var(--r);
+  border:1px solid var(--border);background:var(--surface);
+  color:var(--text2);font-size:12px;cursor:pointer;
+  transition:all .2s;font-family:'Outfit',sans-serif;white-space:nowrap;
+}
+.btn-sm:active{background:var(--surface2);color:var(--text);border-color:var(--border2)}
+.btn-sm i{font-size:14px}
+.btn-sm.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-sm.primary:active{background:#6a5ef5}
+.info-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.info-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:12px}
+.info-card h4{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px}
+.info-card p{font-size:13px;line-height:1.6;color:var(--text2)}
+.concept-list{list-style:none}
+.concept-list li{font-size:12px;color:var(--text2);padding:3px 0;display:flex;align-items:flex-start;gap:5px;line-height:1.5}
+.concept-list li::before{content:'→';color:var(--accent);font-size:11px;margin-top:2px;flex-shrink:0}
+
+/* ── QUIZ ── */
+.quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.quiz-progress{flex:1;height:5px;background:var(--surface2);border-radius:3px;margin:0 12px;overflow:hidden}
+.quiz-progress-bar{height:100%;background:var(--accent);border-radius:3px;transition:width .4s}
+.question-card{background:var(--surface);border-radius:var(--r2);border:1px solid var(--border);padding:20px;margin-bottom:12px}
+.question-num{font-size:11px;font-weight:600;color:var(--accent3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.question-text{font-size:16px;font-weight:500;line-height:1.5;margin-bottom:16px}
+.answers{display:flex;flex-direction:column;gap:7px}
+.answer-btn{
+  width:100%;padding:11px 14px;border-radius:var(--r);
+  border:1px solid var(--border);background:var(--bg3);
+  color:var(--text);font-size:13px;text-align:left;cursor:pointer;
+  transition:all .2s;font-family:'Outfit',sans-serif;font-weight:400;line-height:1.4;
+}
+.answer-btn:active:not(:disabled){border-color:var(--accent);background:rgba(124,111,255,.08)}
+.answer-btn.correct{border-color:var(--green);background:rgba(52,211,153,.12);color:var(--green)}
+.answer-btn.wrong{border-color:var(--red);background:rgba(248,113,113,.1);color:var(--red)}
+.answer-btn:disabled{cursor:default}
+.feedback-box{padding:11px 14px;border-radius:var(--r);margin-top:10px;font-size:13px;line-height:1.6}
+.feedback-box.ok{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);color:var(--green)}
+.feedback-box.ko{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--red)}
+.quiz-end{text-align:center;padding:24px 0}
+.quiz-end .big-score{font-family:'Space Grotesk',sans-serif;font-size:52px;font-weight:700;color:var(--accent3)}
+.stars{font-size:30px;margin:6px 0}
+.quiz-end p{color:var(--text2);font-size:14px;margin-top:6px;line-height:1.6}
+
+/* ── ARCHIVE ── */
+.archive-grid{display:grid;gap:10px}
+.archive-card{background:var(--surface);border-radius:var(--r2);border:1px solid var(--border);padding:16px;cursor:pointer;transition:all .2s}
+.archive-card:active{background:var(--surface2);border-color:var(--border2)}
+.archive-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.archive-card-title{font-size:15px;font-weight:600;line-height:1.3}
+.archive-badge{font-size:11px;padding:3px 9px;border-radius:20px;background:rgba(124,111,255,.15);color:var(--accent3);font-weight:500;flex-shrink:0}
+.archive-concepts{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.concept-tag{font-size:11px;padding:3px 7px;border-radius:6px;background:var(--bg3);color:var(--text3);border:1px solid var(--border)}
+.archive-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:9px;border-top:1px solid var(--border)}
+.archive-footer span{font-size:11px;color:var(--text3)}
+.del-btn{font-size:12px;color:var(--red);background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;opacity:.7;padding:3px 6px}
+.del-btn:active{opacity:1}
+
+/* ── MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;
+  display:none;align-items:flex-end;justify-content:center;padding:0;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r2) var(--r2) 0 0;
+  padding:20px;width:100%;max-height:80vh;overflow-y:auto;
+  padding-bottom:calc(var(--safe-bottom) + 20px);
+}
+.modal h2{font-family:'Space Grotesk',sans-serif;font-size:18px;margin-bottom:14px}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:40px 16px;color:var(--text3)}
+.empty i{font-size:44px;margin-bottom:10px;display:block}
+.empty p{font-size:13px;line-height:1.6}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:calc(var(--safe-bottom) + 20px);
+  left:50%;transform:translateX(-50%) translateY(100px);
+  background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);
+  padding:9px 18px;font-size:13px;z-index:300;transition:transform .3s;
+  white-space:nowrap;box-shadow:var(--shadow);
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── INSTALL BANNER ── */
+.install-banner{
+  display:none;align-items:center;gap:10px;
+  padding:10px 14px;background:rgba(124,111,255,.12);
+  border-bottom:1px solid var(--border2);
+}
+.install-banner.visible{display:flex}
+.install-banner p{flex:1;font-size:12px;color:var(--text2);line-height:1.4}
+.install-banner button{
+  padding:6px 12px;border-radius:8px;background:var(--accent);
+  border:none;color:#fff;font-size:12px;font-weight:600;cursor:pointer;
+  font-family:'Outfit',sans-serif;white-space:nowrap;
+}
+</style>
+</head>
+<body>
+
+<div id="install-banner" class="install-banner">
+  <i class="ti ti-download" style="font-size:20px;color:var(--accent);flex-shrink:0"></i>
+  <p>Installa MappaMente sul tuo telefono per usarla offline!</p>
+  <button onclick="installApp()">Installa</button>
+  <button onclick="dismissBanner()" style="background:transparent;color:var(--text3);border:none;cursor:pointer;font-size:18px">×</button>
+</div>
+
+<header class="topbar">
+  <div class="logo">Mappa<span>Mente</span></div>
+  <div class="topbar-right">
+    <button class="icon-btn" onclick="showScreen('archive')" title="Archivio"><i class="ti ti-books"></i></button>
+  </div>
+</header>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showScreen('home')" id="nav-home"><i class="ti ti-home"></i> Home</button>
+  <button class="nav-btn" onclick="showScreen('upload')" id="nav-upload"><i class="ti ti-camera"></i> Nuova</button>
+  <button class="nav-btn" onclick="showScreen('map')" id="nav-map" style="display:none"><i class="ti ti-sitemap"></i> Mappa</button>
+  <button class="nav-btn" onclick="showScreen('quiz')" id="nav-quiz" style="display:none"><i class="ti ti-brain"></i> Quiz</button>
+  <button class="nav-btn" onclick="showScreen('archive')" id="nav-archive"><i class="ti ti-books"></i> Archivio</button>
+</nav>
+
+<main class="main">
+
+  <!-- HOME -->
+  <div class="screen active" id="screen-home">
+    <div class="hero">
+      <h1>Studia meglio con le<br><em>mappe AI</em> 🧠</h1>
+      <p>Fotografa una pagina del libro e lascia che l'intelligenza artificiale crei la mappa concettuale, ti interroghi e tenga traccia dei progressi.</p>
+    </div>
+    <div class="action-grid">
+      <div class="action-card" onclick="showScreen('upload')">
+        <div class="action-icon">📸</div>
+        <h3>Foto del libro</h3>
+        <p>Scatta o carica una foto e genera la mappa</p>
+      </div>
+      <div class="action-card" onclick="goToText()">
+        <div class="action-icon">✍️</div>
+        <h3>Testo diretto</h3>
+        <p>Incolla un testo e crea subito la mappa</p>
+      </div>
+      <div class="action-card" onclick="showScreen('archive')">
+        <div class="action-icon">📚</div>
+        <h3>Le mie mappe</h3>
+        <p>Ripassa le mappe salvate</p>
+      </div>
+      <div class="action-card" onclick="goToQuiz()">
+        <div class="action-icon">🧠</div>
+        <h3>Quiz rapido</h3>
+        <p>Mettiti alla prova con l'ultima mappa</p>
+      </div>
+    </div>
+    <div class="recent-section">
+      <div class="section-title">Mappe recenti</div>
+      <div id="recent-list"></div>
+    </div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="screen" id="screen-upload">
+    <div id="upload-state">
+      <div class="upload-area" id="drop-zone">
+        <input type="file" accept="image/*" id="file-input" onchange="handleFileSelect(this)">
+        <div class="upload-icon"><i class="ti ti-photo-up"></i></div>
+        <h3>Carica la pagina del libro</h3>
+        <p>Tocca per selezionare un'immagine</p>
+      </div>
+      <div class="or-divider">— oppure —</div>
+      <button class="camera-btn" onclick="openCamera()"><i class="ti ti-camera"></i> Usa la fotocamera</button>
+      <input type="file" accept="image/*" capture="environment" id="camera-input" style="display:none" onchange="handleFileSelect(this)">
+      <div class="or-divider">— oppure incolla il testo —</div>
+      <textarea id="text-input" placeholder="Incolla qui il testo della pagina che vuoi trasformare in mappa concettuale..."></textarea>
+      <div style="margin-top:12px">
+        <div class="section-title" style="margin-bottom:8px">Materia</div>
+        <div class="subject-select" id="chips-upload">
+          <button class="subj-chip active" onclick="selectSubject(this,'Generale','chips-upload')">📖 Generale</button>
+          <button class="subj-chip" onclick="selectSubject(this,'Storia','chips-upload')">🏛️ Storia</button>
+          <button class="subj-chip" onclick="selectSubject(this,'Scienze','chips-upload')">🔬 Scienze</button>
+          <button class="subj-chip" onclick="selectSubject(this,'Geografia','chips-upload')">🌍 Geografia</button>
+          <button class="subj-chip" onclick="selectSubject(this,'Letteratura','chips-upload')">📜 Letteratura</button>
+          <button class="subj-chip" onclick="selectSubject(this,'Filosofia','chips-upload')">💡 Filosofia</button>
+          <button class="subj-chip" onclick="selectSubject(this,'Matematica','chips-upload')">🔢 Matematica</button>
+          <button class="subj-chip" onclick="selectSubject(this,'Fisica','chips-upload')">⚛️ Fisica</button>
+        </div>
+      </div>
+      <button class="btn-main" style="margin-top:14px" onclick="startGeneration()">
+        <i class="ti ti-sparkles"></i> Genera mappa concettuale
+      </button>
+    </div>
+
+    <div id="preview-state" style="display:none">
+      <img id="preview-img" class="preview-img" alt="Anteprima pagina">
+      <div style="margin-top:10px">
+        <div class="section-title" style="margin-bottom:8px">Materia</div>
+        <div class="subject-select" id="chips-preview">
+          <button class="subj-chip active" onclick="selectSubject(this,'Generale','chips-preview')">📖 Generale</button>
+          <button class="subj-chip" onclick="selectSubject(this,'Storia','chips-preview')">🏛️ Storia</button>
+          <button class="subj-chip" onclick="selectSubject(this,'Scienze','chips-preview')">🔬 Scienze</button>
+          <button class="subj-chip" onclick="selectSubject(this,'Geografia','chips-preview')">🌍 Geografia</button>
+          <button class="subj-chip" onclick="selectSubject(this,'Letteratura','chips-preview')">📜 Letteratura</button>
+          <button class="subj-chip" onclick="selectSubject(this,'Filosofia','chips-preview')">💡 Filosofia</button>
+          <button class="subj-chip" onclick="selectSubject(this,'Matematica','chips-preview')">🔢 Matematica</button>
+          <button class="subj-chip" onclick="selectSubject(this,'Fisica','chips-preview')">⚛️ Fisica</button>
+        </div>
+      </div>
+      <div class="map-actions" style="margin-top:10px">
+        <button class="btn-sm" onclick="resetUpload()"><i class="ti ti-x"></i> Cambia</button>
+        <button class="btn-main" style="flex:1" onclick="startGeneration()">
+          <i class="ti ti-sparkles"></i> Genera mappa
+        </button>
+      </div>
+    </div>
+
+    <div id="loading-state" style="display:none">
+      <div class="loading-box">
+        <div class="spinner"></div>
+        <div style="font-size:15px;font-weight:600">L'AI sta leggendo la pagina...</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:5px">Sto estraendo i concetti chiave e costruendo la mappa</div>
+        <div class="loading-steps">
+          <div class="loading-step active" id="step1"><i class="ti ti-eye"></i> Analisi del contenuto</div>
+          <div class="loading-step" id="step2"><i class="ti ti-brain"></i> Identificazione concetti chiave</div>
+          <div class="loading-step" id="step3"><i class="ti ti-sitemap"></i> Costruzione della mappa</div>
+          <div class="loading-step" id="step4"><i class="ti ti-help-circle"></i> Generazione domande quiz</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAPPA -->
+  <div class="screen" id="screen-map">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px">
+      <div style="min-width:0">
+        <div id="map-title" style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        <div id="map-subject" style="font-size:12px;color:var(--accent3);margin-top:2px"></div>
+      </div>
+      <div style="display:flex;gap:5px;flex-shrink:0">
+        <button class="btn-sm" onclick="saveCurrentMap()"><i class="ti ti-device-floppy"></i> Salva</button>
+        <button class="btn-sm primary" onclick="showScreen('quiz')"><i class="ti ti-brain"></i> Quiz</button>
+      </div>
+    </div>
+    <div class="map-canvas">
+      <svg class="map-svg" id="map-svg" viewBox="0 0 800 360" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div class="map-legend" id="map-legend"></div>
+    <div class="info-cards" id="info-cards"></div>
+    <div style="margin-top:12px">
+      <div class="section-title">Riepilogo</div>
+      <div id="map-summary" style="font-size:13px;color:var(--text2);line-height:1.7;padding:12px;background:var(--surface);border-radius:var(--r);border:1px solid var(--border)"></div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="screen-quiz">
+    <div id="quiz-running">
+      <div class="quiz-header">
+        <span id="quiz-q-num" style="font-size:12px;color:var(--text2)">1/5</span>
+        <div class="quiz-progress"><div class="quiz-progress-bar" id="quiz-bar" style="width:20%"></div></div>
+        <span style="font-size:12px;color:var(--text2)">✅ <span id="correct-count">0</span></span>
+      </div>
+      <div class="question-card" id="question-card"></div>
+      <button class="btn-main" id="next-btn" onclick="nextQuestion()" style="display:none">
+        Prossima <i class="ti ti-arrow-right"></i>
+      </button>
+    </div>
+    <div id="quiz-end" style="display:none">
+      <div class="quiz-end">
+        <div class="big-score" id="final-score"></div>
+        <div class="stars" id="final-stars"></div>
+        <p id="final-msg"></p>
+        <div class="map-actions" style="margin-top:20px;justify-content:center">
+          <button class="btn-sm" onclick="restartQuiz()"><i class="ti ti-refresh"></i> Riprova</button>
+          <button class="btn-sm primary" onclick="showScreen('map')"><i class="ti ti-sitemap"></i> Rivedi mappa</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARCHIVE -->
+  <div class="screen" id="screen-archive">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700">Archivio mappe</div>
+      <button class="btn-sm primary" onclick="showScreen('upload')"><i class="ti ti-plus"></i> Nuova</button>
+    </div>
+    <div id="archive-list" class="archive-grid"></div>
+  </div>
+
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="detail-modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <h2 id="modal-title"></h2>
+    <div id="modal-content"></div>
+    <div class="map-actions" style="margin-top:14px">
+      <button class="btn-sm" onclick="closeDetailModal()"><i class="ti ti-x"></i> Chiudi</button>
+      <button class="btn-sm primary" onclick="loadFromArchive()"><i class="ti ti-sitemap"></i> Apri mappa</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'mappamente_maps_v2';
+let selectedSubject = 'Generale';
+let selectedFile = null;
+let currentMapData = null;
+let quizState = { questions: [], current: 0, score: 0 };
+let selectedArchiveMap = null;
+let deferredInstallPrompt = null;
+
+// ── PWA INSTALL ───────────────────────────────────────────────────────────────
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  if (!localStorage.getItem('mm_install_dismissed')) {
+    document.getElementById('install-banner').classList.add('visible');
+  }
+});
+
+function installApp() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(() => {
+      deferredInstallPrompt = null;
+      dismissBanner();
+    });
+  }
+}
+
+function dismissBanner() {
+  localStorage.setItem('mm_install_dismissed', '1');
+  document.getElementById('install-banner').classList.remove('visible');
+}
+
+// Service Worker registration
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  const nb = document.getElementById('nav-' + name);
+  if (nb) nb.classList.add('active');
+  if (name === 'home') renderRecent();
+  if (name === 'archive') renderArchive();
+  if (name === 'quiz' && currentMapData) startQuiz();
+  window.scrollTo && window.scrollTo(0, 0);
+  document.querySelector('.main').scrollTop = 0;
+}
+
+function goToText() {
+  showScreen('upload');
+  document.getElementById('text-input').focus();
+}
+
+function goToQuiz() {
+  if (window.currentMapData) showScreen('quiz');
+  else showToast('Prima crea una mappa!');
+}
+
+// ── SUBJECT CHIPS ─────────────────────────────────────────────────────────────
+function selectSubject(el, val, groupId) {
+  document.querySelectorAll('#' + groupId + ' .subj-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  selectedSubject = val;
+}
+
+// ── FILE HANDLING ─────────────────────────────────────────────────────────────
+function openCamera() { document.getElementById('camera-input').click(); }
+
+function handleFileSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('upload-state').style.display = 'none';
+    document.getElementById('preview-state').style.display = 'block';
+    document.getElementById('preview-img').src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function resetUpload() {
+  selectedFile = null;
+  document.getElementById('upload-state').style.display = 'block';
+  document.getElementById('preview-state').style.display = 'none';
+  document.getElementById('file-input').value = '';
+  document.getElementById('camera-input').value = '';
+}
+
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('Errore lettura file'));
+    r.readAsDataURL(file);
+  });
+}
+
+// ── GENERATION ────────────────────────────────────────────────────────────────
+async function startGeneration() {
+  const textInput = document.getElementById('text-input').value.trim();
+  if (!selectedFile && !textInput) {
+    showToast('Carica un\'immagine o inserisci del testo!');
+    return;
+  }
+
+  document.getElementById('upload-state').style.display = 'none';
+  document.getElementById('preview-state').style.display = 'none';
+  document.getElementById('loading-state').style.display = 'block';
+  animateLoadingSteps();
+
+  try {
+    let messages;
+    if (selectedFile) {
+      const b64 = await fileToBase64(selectedFile);
+      const mt = selectedFile.type || 'image/jpeg';
+      messages = [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: mt, data: b64 } },
+          { type: 'text', text: buildPrompt(selectedSubject, null) }
+        ]
+      }];
+    } else {
+      messages = [{ role: 'user', content: buildPrompt(selectedSubject, textInput) }];
+    }
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages
+      })
+    });
+
+    if (!res.ok) throw new Error('Errore API: ' + res.status);
+    const data = await res.json();
+    const text = data.content.map(c => c.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    currentMapData = {
+      ...parsed,
+      subject: selectedSubject,
+      date: new Date().toLocaleDateString('it-IT')
+    };
+    window.currentMapData = currentMapData;
+
+    clearInterval(loadingInterval);
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('upload-state').style.display = 'block';
+    document.getElementById('text-input').value = '';
+    selectedFile = null;
+
+    document.getElementById('nav-map').style.display = 'flex';
+    document.getElementById('nav-quiz').style.display = 'flex';
+
+    renderMap(currentMapData);
+    showScreen('map');
+  } catch (e) {
+    clearInterval(loadingInterval);
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('upload-state').style.display = 'block';
+    showToast('Errore: ' + e.message);
+  }
+}
+
+function buildPrompt(subject, text) {
+  const base = text
+    ? `Analizza questo testo:\n\n${text}\n\n`
+    : 'Analizza attentamente la pagina del libro in questa immagine. ';
+  return base + `Sei un assistente educativo per studenti delle scuole medie e superiori. Materia: ${subject}.
+
+Crea una mappa concettuale ed estrai quiz di studio. Rispondi SOLO con JSON valido, senza backtick né testo extra:
+{
+  "title": "Titolo argomento principale (max 5 parole)",
+  "summary": "Riassunto chiaro in 3-4 frasi",
+  "centralNode": "Concetto centrale (2-4 parole)",
+  "branches": [
+    {
+      "label": "Ramo principale (2-3 parole)",
+      "color": "purple|teal|amber|coral|blue|green",
+      "children": ["sottoconcetto 1", "sottoconcetto 2", "sottoconcetto 3"]
+    }
+  ],
+  "keyPoints": ["punto chiave 1", "punto chiave 2", "punto chiave 3", "punto chiave 4"],
+  "quiz": [
+    {
+      "question": "Domanda chiara e specifica?",
+      "options": ["risposta corretta", "distractor 1", "distractor 2", "distractor 3"],
+      "correct": 0,
+      "explanation": "Spiegazione breve del perché è corretta (1-2 frasi)"
+    }
+  ]
+}
+Crea ALMENO 3 rami con 2-3 figli ciascuno, e 5 domande quiz. Domande educational adatte agli studenti.`;
+}
+
+// ── LOADING ANIMATION ─────────────────────────────────────────────────────────
+let loadingInterval;
+function animateLoadingSteps() {
+  const steps = ['step1','step2','step3','step4'];
+  steps.forEach(id => { document.getElementById(id).className = 'loading-step'; });
+  document.getElementById(steps[0]).classList.add('active');
+  let i = 0;
+  loadingInterval = setInterval(() => {
+    if (i < steps.length) document.getElementById(steps[i]).classList.add('done');
+    i++;
+    if (i < steps.length) document.getElementById(steps[i]).classList.add('active');
+    else clearInterval(loadingInterval);
+  }, 1400);
+}
+
+// ── MAP RENDERING ─────────────────────────────────────────────────────────────
+const COLORS = {
+  purple:{ fill:'#3c3489', stroke:'#7c6fff', text:'#c4b5fd', child:'#252550', childText:'#a78fff' },
+  teal:  { fill:'#0f6e56', stroke:'#1d9e75', text:'#9fe1cb', child:'#04342c', childText:'#5dcaa5' },
+  amber: { fill:'#854f0b', stroke:'#ef9f27', text:'#fac775', child:'#412402', childText:'#ef9f27' },
+  coral: { fill:'#993c1d', stroke:'#d85a30', text:'#f5c4b3', child:'#4a1b0c', childText:'#f0997b' },
+  blue:  { fill:'#185fa5', stroke:'#378add', text:'#b5d4f4', child:'#042c53', childText:'#85b7eb' },
+  green: { fill:'#3b6d11', stroke:'#639922', text:'#c0dd97', child:'#173404', childText:'#97c459' }
+};
+
+function renderMap(data) {
+  document.getElementById('map-title').textContent = data.title || 'Mappa';
+  document.getElementById('map-subject').textContent = '📚 ' + (data.subject || 'Generale');
+  document.getElementById('map-summary').textContent = data.summary || '';
+
+  const svg = document.getElementById('map-svg');
+  svg.innerHTML = '';
+  const ns = 'http://www.w3.org/2000/svg';
+  const W = 800, H = 360, cx = W / 2, cy = H / 2;
+
+  // defs
+  const defs = document.createElementNS(ns, 'defs');
+  ['arr','arr2','arr3','arr4','arr5','arr6'].forEach((id, i) => {
+    const colors = ['#534ab7','#0f6e56','#854f0b','#993c1d','#185fa5','#3b6d11'];
+    defs.innerHTML += `<marker id="${id}" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="${colors[i]}" opacity="0.7"/></marker>`;
+  });
+  svg.appendChild(defs);
+
+  // central node
+  const cW = 150, cH = 40;
+  mkRect(svg, ns, cx-cW/2, cy-cH/2, cW, cH, 10, '#1a1a38', '#7c6fff', 2);
+  mkText(svg, ns, cx, cy, data.centralNode || 'Concetto', '#c4b5fd', 13, 600, 18);
+
+  const branches = data.branches || [];
+  const n = branches.length;
+  const arrIds = ['arr','arr2','arr3','arr4','arr5','arr6'];
+  const branchR = 155, childR = 75;
+
+  const legendItems = [];
+
+  branches.forEach((branch, i) => {
+    const angle = (i * 2 * Math.PI / n) - Math.PI / 2;
+    const bx = cx + branchR * Math.cos(angle);
+    const by = cy + branchR * Math.sin(angle);
+    const col = COLORS[branch.color] || COLORS.purple;
+
+    if (!legendItems.find(l => l.color === branch.color)) {
+      legendItems.push({ label: branch.label, color: col.stroke });
+    }
+
+    mkLine(svg, ns, cx, cy, bx, by, col.stroke, 1.5, arrIds[i % arrIds.length]);
+
+    const bW = 115, bH = 34;
+    mkRect(svg, ns, bx-bW/2, by-bH/2, bW, bH, 8, col.fill, col.stroke, 1.5);
+    mkText(svg, ns, bx, by, branch.label, col.text, 11, 600, 15);
+
+    const children = branch.children || [];
+    children.forEach((child, j) => {
+      const spread = Math.min(0.6, 0.3 + children.length * 0.08);
+      const ca = angle + (j - (children.length - 1) / 2) * spread;
+      const chx = bx + childR * Math.cos(ca);
+      const chy = by + childR * Math.sin(ca);
+
+      mkLine(svg, ns, bx, by, chx, chy, col.stroke, 1, null);
+      mkRect(svg, ns, chx-48, chy-13, 96, 26, 6, col.child, col.stroke, 1);
+      mkText(svg, ns, chx, chy, child, col.childText, 9, 400, 13);
+    });
+  });
+
+  // legend
+  document.getElementById('map-legend').innerHTML = legendItems.map(l =>
+    `<div class="legend-item"><div class="legend-dot" style="background:${l.color}"></div><span>${l.label}</span></div>`
+  ).join('');
+
+  // info cards
+  document.getElementById('info-cards').innerHTML = `
+    <div class="info-card">
+      <h4>Punti chiave</h4>
+      <ul class="concept-list">${(data.keyPoints||[]).map(p=>`<li>${p}</li>`).join('')}</ul>
+    </div>
+    <div class="info-card">
+      <h4>Quiz pronti</h4>
+      <p style="font-size:22px;font-weight:700;color:var(--accent3)">${(data.quiz||[]).length}</p>
+      <p style="margin-top:5px;font-size:12px">domande per interrogarti su questo argomento</p>
+      <button class="btn-sm primary" style="margin-top:10px;width:100%" onclick="showScreen('quiz')"><i class="ti ti-brain"></i> Inizia quiz</button>
+    </div>`;
+}
+
+function mkLine(svg, ns, x1, y1, x2, y2, color, w, markerId) {
+  const l = document.createElementNS(ns, 'line');
+  l.setAttribute('x1', x1); l.setAttribute('y1', y1);
+  l.setAttribute('x2', x2); l.setAttribute('y2', y2);
+  l.setAttribute('stroke', color); l.setAttribute('stroke-width', w);
+  l.setAttribute('opacity', '0.5');
+  if (markerId) l.setAttribute('marker-end', 'url(#' + markerId + ')');
+  svg.appendChild(l);
+}
+
+function mkRect(svg, ns, x, y, w, h, r, fill, stroke, sw) {
+  const rect = document.createElementNS(ns, 'rect');
+  rect.setAttribute('x', x); rect.setAttribute('y', y);
+  rect.setAttribute('width', w); rect.setAttribute('height', h);
+  rect.setAttribute('rx', r); rect.setAttribute('fill', fill);
+  rect.setAttribute('stroke', stroke); rect.setAttribute('stroke-width', sw);
+  svg.appendChild(rect);
+}
+
+function mkText(svg, ns, x, y, text, color, size, weight, maxChars) {
+  const t = document.createElementNS(ns, 'text');
+  const truncated = text && text.length > maxChars ? text.substring(0, maxChars-1) + '…' : (text || '');
+  t.setAttribute('x', x); t.setAttribute('y', y);
+  t.setAttribute('text-anchor', 'middle');
+  t.setAttribute('dominant-baseline', 'middle');
+  t.setAttribute('fill', color);
+  t.setAttribute('font-size', size);
+  t.setAttribute('font-weight', weight);
+  t.setAttribute('font-family', 'Outfit, sans-serif');
+  t.textContent = truncated;
+  svg.appendChild(t);
+}
+
+// ── QUIZ ──────────────────────────────────────────────────────────────────────
+function startQuiz() {
+  if (!currentMapData?.quiz?.length) { showToast('Nessun quiz disponibile'); return; }
+  quizState = { questions: shuffle([...currentMapData.quiz]), current: 0, score: 0 };
+  document.getElementById('quiz-running').style.display = 'block';
+  document.getElementById('quiz-end').style.display = 'none';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = quizState.questions[quizState.current];
+  const total = quizState.questions.length;
+  document.getElementById('quiz-q-num').textContent = `${quizState.current + 1}/${total}`;
+  document.getElementById('quiz-bar').style.width = `${((quizState.current + 1) / total) * 100}%`;
+  document.getElementById('correct-count').textContent = quizState.score;
+  document.getElementById('next-btn').style.display = 'none';
+
+  const shuffled = shuffleWithCorrect(q.options, q.correct);
+  document.getElementById('question-card').innerHTML = `
+    <div class="question-num">Domanda ${quizState.current + 1} di ${total}</div>
+    <div class="question-text">${q.question}</div>
+    <div class="answers" id="answers">
+      ${shuffled.options.map((opt, i) =>
+        `<button class="answer-btn" onclick="selectAnswer(this,${i},${shuffled.correctIdx},'${esc(q.explanation)}')">${String.fromCharCode(65+i)}. ${opt}</button>`
+      ).join('')}
+    </div>
+    <div id="feedback"></div>`;
+}
+
+function selectAnswer(btn, idx, correct, explanation) {
+  document.querySelectorAll('.answer-btn').forEach(b => b.disabled = true);
+  const ok = idx === correct;
+  btn.classList.add(ok ? 'correct' : 'wrong');
+  document.querySelectorAll('.answer-btn')[correct].classList.add('correct');
+  if (ok) quizState.score++;
+  document.getElementById('correct-count').textContent = quizState.score;
+  document.getElementById('feedback').innerHTML =
+    `<div class="feedback-box ${ok?'ok':'ko'}">${ok?'✅ Esatto! ':'❌ Non esatto. '}${explanation}</div>`;
+  const isLast = quizState.current >= quizState.questions.length - 1;
+  const nb = document.getElementById('next-btn');
+  nb.style.display = 'flex';
+  nb.innerHTML = isLast ? 'Vedi risultati <i class="ti ti-trophy"></i>' : 'Prossima <i class="ti ti-arrow-right"></i>';
+}
+
+function nextQuestion() {
+  quizState.current++;
+  if (quizState.current >= quizState.questions.length) showResults();
+  else renderQuestion();
+}
+
+function showResults() {
+  document.getElementById('quiz-running').style.display = 'none';
+  document.getElementById('quiz-end').style.display = 'block';
+  const total = quizState.questions.length;
+  const pct = Math.round((quizState.score / total) * 100);
+  document.getElementById('final-score').textContent = pct + '%';
+  document.getElementById('final-stars').textContent = pct >= 80 ? '⭐⭐⭐' : pct >= 60 ? '⭐⭐' : '⭐';
+  document.getElementById('final-msg').textContent = pct >= 80
+    ? `Ottimo! Hai risposto correttamente a ${quizState.score}/${total} domande. Sei pronto per l'interrogazione! 🎉`
+    : pct >= 60
+    ? `Bene! ${quizState.score}/${total} corrette. Ripasssa ancora un po' prima dell'interrogazione. 💪`
+    : `${quizState.score}/${total} corrette. Rileggi la mappa e riprova, ce la fai! 📚`;
+}
+
+function restartQuiz() {
+  quizState = { questions: shuffle([...currentMapData.quiz]), current: 0, score: 0 };
+  document.getElementById('quiz-running').style.display = 'block';
+  document.getElementById('quiz-end').style.display = 'none';
+  renderQuestion();
+}
+
+// ── ARCHIVE ───────────────────────────────────────────────────────────────────
+function getArchive() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+  catch { return []; }
+}
+function setArchive(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+
+function saveCurrentMap() {
+  if (!currentMapData) return;
+  const archive = getArchive();
+  const id = Date.now();
+  archive.unshift({ id, ...currentMapData });
+  if (archive.length > 50) archive.splice(50); // keep max 50 maps
+  setArchive(archive);
+  showToast('✅ Mappa salvata nell\'archivio!');
+  renderRecent();
+}
+
+function renderRecent() {
+  const archive = getArchive().slice(0, 3);
+  const el = document.getElementById('recent-list');
+  if (!archive.length) {
+    el.innerHTML = `<div style="text-align:center;color:var(--text3);font-size:13px;padding:20px">Nessuna mappa salvata ancora</div>`;
+    return;
+  }
+  el.innerHTML = archive.map(m => `
+    <div class="map-card-mini" onclick="loadMapAndShow(${m.id})">
+      <div class="map-tag">📚</div>
+      <div class="map-info">
+        <h4>${m.title || 'Mappa'}</h4>
+        <p>${m.subject || 'Generale'} · ${(m.quiz||[]).length} domande</p>
+      </div>
+      <div class="map-meta">${m.date || ''}</div>
+    </div>`).join('');
+}
+
+function renderArchive() {
+  const archive = getArchive();
+  const el = document.getElementById('archive-list');
+  if (!archive.length) {
+    el.innerHTML = `<div class="empty"><i class="ti ti-books"></i><p>Nessuna mappa salvata ancora.<br>Crea la tua prima mappa!</p></div>`;
+    return;
+  }
+  el.innerHTML = archive.map(m => `
+    <div class="archive-card" onclick="openArchiveDetail(${m.id})">
+      <div class="archive-card-header">
+        <div class="archive-card-title">${m.title || 'Mappa'}</div>
+        <span class="archive-badge">${m.subject || 'Generale'}</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.5">${(m.summary||'').substring(0,110)}...</div>
+      <div class="archive-concepts">
+        ${(m.branches||[]).map(b=>`<span class="concept-tag">${b.label}</span>`).join('')}
+      </div>
+      <div class="archive-footer">
+        <span><i class="ti ti-calendar" style="font-size:12px;vertical-align:-2px"></i> ${m.date||''} &nbsp;·&nbsp; <i class="ti ti-help-circle" style="font-size:12px;vertical-align:-2px"></i> ${(m.quiz||[]).length} domande</span>
+        <button class="del-btn" onclick="event.stopPropagation();deleteMap(${m.id})">Elimina</button>
+      </div>
+    </div>`).join('');
+}
+
+function openArchiveDetail(id) {
+  const m = getArchive().find(x => x.id === id);
+  if (!m) return;
+  selectedArchiveMap = m;
+  document.getElementById('modal-title').textContent = m.title || 'Mappa';
+  document.getElementById('modal-content').innerHTML = `
+    <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px">${m.summary||''}</p>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:7px">Concetti principali:</div>
+    <div class="archive-concepts">${(m.branches||[]).map(b=>`<span class="concept-tag">${b.label}</span>`).join('')}</div>
+    <div style="margin-top:11px;font-size:11px;color:var(--text3)">${(m.quiz||[]).length} domande quiz · ${m.date||''}</div>`;
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function loadFromArchive() {
+  if (!selectedArchiveMap) return;
+  currentMapData = selectedArchiveMap;
+  window.currentMapData = currentMapData;
+  document.getElementById('nav-map').style.display = 'flex';
+  document.getElementById('nav-quiz').style.display = 'flex';
+  closeDetailModal();
+  renderMap(currentMapData);
+  showScreen('map');
+}
+
+function loadMapAndShow(id) {
+  const m = getArchive().find(x => x.id === id);
+  if (!m) return;
+  selectedArchiveMap = m;
+  loadFromArchive();
+}
+
+function deleteMap(id) {
+  if (!confirm('Eliminare questa mappa dall\'archivio?')) return;
+  setArchive(getArchive().filter(m => m.id !== id));
+  renderArchive();
+  renderRecent();
+  showToast('Mappa eliminata');
+}
+
+function closeDetailModal() { document.getElementById('detail-modal').classList.remove('open'); }
+function closeModalOutside(e) { if (e.target === document.getElementById('detail-modal')) closeDetailModal(); }
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function shuffle(arr) {
+  for (let i = arr.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function shuffleWithCorrect(options, correctIdx) {
+  const correctAnswer = options[correctIdx];
+  const shuffled = shuffle([...options]);
+  return { options: shuffled, correctIdx: shuffled.indexOf(correctAnswer) };
+}
+
+function esc(s) { return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── DRAG & DROP ───────────────────────────────────────────────────────────────
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.borderColor = 'var(--accent)'; });
+dz.addEventListener('dragleave', () => { dz.style.borderColor = ''; });
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.style.borderColor = '';
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) {
+    selectedFile = f;
+    const r = new FileReader();
+    r.onload = ev => {
+      document.getElementById('upload-state').style.display = 'none';
+      document.getElementById('preview-state').style.display = 'block';
+      document.getElementById('preview-img').src = ev.target.result;
+    };
+    r.readAsDataURL(f);
+  }
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderRecent();
+</script>
+</body>
+</html>
