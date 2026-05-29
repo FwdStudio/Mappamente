@@ -403,7 +403,7 @@ let currentMapData = null;
 let quizState = { questions: [], current: 0, score: 0 };
 let selectedArchiveMap = null;
 
-function getApiKey() { return "AQ.Ab8RN6KDFWuLEB-bYNsIEW1EAComCOUgrebsikOANQMbaT5URg"; }
+function getApiKey() { return localStorage.getItem(APIKEY_KEY) || ''; }
 function saveApiKey(k) { localStorage.setItem(APIKEY_KEY, k.trim()); }
 
 function saveKey() {
